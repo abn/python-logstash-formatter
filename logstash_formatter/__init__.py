@@ -150,6 +150,16 @@ class LogstashFormatterV1(LogstashFormatter):
                 pass
             fields['message'] = msg
 
+        if 'args' in fields and False:
+            # enforce args to be made strings before using json.dumps
+            if not isinstance(fields['args'], tuple):
+                # handles the case where args is a single non-tuple object
+                # eg: logger.info('Log this dict: %s', {'hello': 'world'})
+                fields['args'] = [str(fields['args'])]
+            else:
+                # handles all other cases by apllying str() on all args
+                fields['args'] = [str(arg) for arg in fields['args']]
+
         if 'exc_info' in fields:
             if fields['exc_info']:
                 formatted = tb.format_exception(*fields['exc_info'])
